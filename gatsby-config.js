@@ -1,11 +1,11 @@
 module.exports = {
   siteMetadata: {
-    title: `Gatsby Starter Blog`,
+    title: `Blair MacNeil's Personal Blog`,
     author: {
       name: `Blair MacNeil`,
       summary: `who lives and works in Toronto.`,
     },
-    description: `A starter blog demonstrating what Gatsby can do.`,
+    description: `Thoughts on software, architecture, infrastructure and technology.`,
     siteUrl: `https://macneib.github.io/`,
     social: {
       twitter: `macneib`,
