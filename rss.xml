@@ -1,4 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Blair MacNeil's Blog]]></title><description><![CDATA[Thoughts on software, architecture, infrastructure and technology.]]></description><link>https://macneib.github.io</link><generator>GatsbyJS</generator><lastBuildDate>Wed, 24 Feb 2021 03:43:15 GMT</lastBuildDate><item><title><![CDATA[Microk8s with Calico and Multus on a Raspberry pi cluster]]></title><description><![CDATA[Introduction change the password in each pi board Add nodes in dev machines  files Paste the following snippet install ansible on control…]]></description><link>https://macneib.github.io/02-microk8s-multus-raspberry-pi/</link><guid isPermaLink="false">https://macneib.github.io/02-microk8s-multus-raspberry-pi/</guid><pubDate>Wed, 24 Feb 2021 22:12:03 GMT</pubDate><content:encoded>&lt;h3&gt;Introduction&lt;/h3&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Blair MacNeil's Blog]]></title><description><![CDATA[Thoughts on software, architecture, infrastructure and technology.]]></description><link>https://macneib.github.io</link><generator>GatsbyJS</generator><lastBuildDate>Wed, 24 Feb 2021 08:57:14 GMT</lastBuildDate><item><title><![CDATA[Microk8s with Calico and Multus on a Raspberry pi cluster]]></title><description><![CDATA[Introduction This ultimately failed because multus for microk8s was disabled for ARM64 targets.
+I will watch this issue and try again this…]]></description><link>https://macneib.github.io/02-microk8s-multus-raspberry-pi/</link><guid isPermaLink="false">https://macneib.github.io/02-microk8s-multus-raspberry-pi/</guid><pubDate>Wed, 24 Feb 2021 22:12:03 GMT</pubDate><content:encoded>&lt;h3&gt;Introduction&lt;/h3&gt;
+&lt;p&gt;This ultimately failed because multus for microk8s was disabled for ARM64 targets.
+I will watch &lt;a href=&quot;https://github.com/ubuntu/microk8s/pull/1872&quot;&gt;this issue&lt;/a&gt; and try again this PR has been accepted.&lt;/p&gt;
+&lt;p&gt;Will try with k3sup as that has flannel-cni installed by default and people recomend that as a good starting place.&lt;/p&gt;
+&lt;h3&gt;Step by step instructions&lt;/h3&gt;
 &lt;p&gt;change the password in each pi board&lt;/p&gt;
 &lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;ssh ubuntu@192.168.1.16
 exit
@@ -52,7 +57,29 @@ ansible cube -b -m shell -a &amp;quot;hostnamectl status | grep hostname&amp;quo
 &lt;p&gt;Update the OS&lt;/p&gt;
 &lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;ansible microk8s -m apt -a &amp;quot;upgrade=yes update_cache=yes&amp;quot; --become&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;Enable c-groups so the kubelet will work out of the box&lt;/p&gt;
-&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;ansible microk8s -b -m shell -a &amp;quot;sed -i &amp;#39;$ s/$/ cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 swapaccount=1/&amp;#39; /boot/firmware/cmdline.txt&amp;quot;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content:encoded></item><item><title><![CDATA[Apache Pulsar and ROS2]]></title><description><![CDATA[Introduction What is ROS 2 ROS means Robot Operating System (but it’s not an operating system) Features A Framework, Prescribed patterns and…]]></description><link>https://macneib.github.io/01-pulsar-and-ros2/</link><guid isPermaLink="false">https://macneib.github.io/01-pulsar-and-ros2/</guid><pubDate>Tue, 23 Feb 2021 22:12:03 GMT</pubDate><content:encoded>&lt;h3&gt;Introduction&lt;/h3&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;ansible microk8s -b -m shell -a &amp;quot;sed -i &amp;#39;$ s/$/ cgroup_enable=cpuset cgroup_enable=memory cgroup_memory=1 swapaccount=1/&amp;#39; /boot/firmware/cmdline.txt&amp;quot;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Quick restart to get all the machines updated&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;ansible microk8s -b -m shell -a &amp;quot;shutdown -r now&amp;quot;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Install the MicroK8s snap and components&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;ansible microk8s -b -m shell -a &amp;quot;sudo snap install microk8s --classic&amp;quot;
+ansible microk8s -b -m shell -a &amp;quot;sudo microk8s.enable dns storage&amp;quot;
+sudo reboot now&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Wait 1 minute then check status of masters&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;ansible masters -b -m shell -a &amp;quot;sudo microk8s.kubectl get nodes&amp;quot;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Add workers to master&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;ansible masters -b -m shell -a &amp;quot;sudo microk8s.add-node&amp;quot;
+ansible worker01 -b -m shell -a &amp;quot;microk8s join 192.168.1.16:25000/&amp;lt;token&amp;gt;&amp;quot;
+
+ansible masters -b -m shell -a &amp;quot;sudo microk8s.add-node&amp;quot;
+ansible worker02 -b -m shell -a &amp;quot;microk8s join 192.168.1.16:25000/&amp;lt;token&amp;gt;&amp;quot;
+
+ansible masters -b -m shell -a &amp;quot;sudo microk8s.add-node&amp;quot;
+ansible worker03 -b -m shell -a &amp;quot;microk8s join 192.168.1.16:25000/&amp;lt;token&amp;gt;&amp;quot;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;ansible masters -b -m shell -a &amp;quot;sudo microk8s enable multus&amp;quot;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;[WARNING]: Consider using &amp;#39;become&amp;#39;, &amp;#39;become_method&amp;#39;, and &amp;#39;become_user&amp;#39; rather than running sudo
+master01 | FAILED | rc=1 &amp;gt;&amp;gt;
+Nothing to do for `multus`.non-zero return code&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;And this is the point where I realized that multus is not enabled on microk8s&lt;/p&gt;</content:encoded></item><item><title><![CDATA[Apache Pulsar and ROS2]]></title><description><![CDATA[Introduction What is ROS 2 ROS means Robot Operating System (but it’s not an operating system) Features A Framework, Prescribed patterns and…]]></description><link>https://macneib.github.io/01-pulsar-and-ros2/</link><guid isPermaLink="false">https://macneib.github.io/01-pulsar-and-ros2/</guid><pubDate>Tue, 23 Feb 2021 22:12:03 GMT</pubDate><content:encoded>&lt;h3&gt;Introduction&lt;/h3&gt;
 &lt;h3&gt;What is ROS 2&lt;/h3&gt;
 &lt;p&gt;ROS means Robot Operating System (but it’s not an operating system)&lt;/p&gt;
 &lt;h4&gt;Features&lt;/h4&gt;
