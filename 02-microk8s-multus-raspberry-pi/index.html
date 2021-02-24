@@ -55,7 +55,7 @@ ssh-copy-id -i ~/.ssh/id_ed25519.pub ubuntu@192.168.1.19</code></pre></div>
 <p>Check if Ansible is working fine and can connect to all nodes</p>
 <div class="gatsby-highlight" data-language="text"><pre class="language-text"><code class="language-text">ansible microk8s -m ping</code></pre></div>
 <div class="gatsby-highlight" data-language="text"><pre class="language-text"><code class="language-text">ansible microk8s -b -m shell -a &quot;hostnamectl set-hostname {{ var_hostname }}&quot;
-ansible cube -b -m shell -a &quot;hostnamectl status | grep hostname&quot;</code></pre></div>
+ansible microk8s -b -m shell -a &quot;hostnamectl status | grep hostname&quot;</code></pre></div>
 <p>Update the OS</p>
 <div class="gatsby-highlight" data-language="text"><pre class="language-text"><code class="language-text">ansible microk8s -m apt -a &quot;upgrade=yes update_cache=yes&quot; --become</code></pre></div>
 <p>Enable c-groups so the kubelet will work out of the box</p>
